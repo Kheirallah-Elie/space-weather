@@ -1,13 +1,15 @@
 package org.example.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.example.dto.KpForecastDto;
 import org.example.dto.MagDataDto;
 import org.example.dto.PlasmaDataDto;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -20,25 +22,41 @@ public class DataClient {
         return webClient.get()
                 .uri("https://services.swpc.noaa.gov/products/solar-wind/mag-5-minute.json")
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<List<String>>>() {})
+                .bodyToMono(JsonNode.class)
                 .map(this::mapMagData);
     }
 
-    private List<MagDataDto> mapMagData(List<List<String>> data) {
-        return data.stream()
-                .skip(1) // skip header row
-                .map(row -> {
-                    MagDataDto dto = new MagDataDto();
-                    dto.setTime_tag(row.get(0));
-                    dto.setBx_gsm(parseDouble(row.get(1)));
-                    dto.setBy_gsm(parseDouble(row.get(2)));
-                    dto.setBz_gsm(parseDouble(row.get(3)));
-                    dto.setLon_gsm(parseDouble(row.get(4)));
-                    dto.setLat_gsm(parseDouble(row.get(5)));
-                    dto.setBt(parseDouble(row.get(6)));
-                    return dto;
-                })
-                .toList();
+    private List<MagDataDto> mapMagData(JsonNode node) {
+        if (!node.isArray()) {
+            throw new RuntimeException("Unexpected MAG API response format: " + node);
+        }
+
+        List<MagDataDto> result = new ArrayList<>();
+        Iterator<JsonNode> elements = node.elements();
+
+        boolean isHeader = true;
+
+        while (elements.hasNext()) {
+            JsonNode row = elements.next();
+
+            if (isHeader) {
+                isHeader = false;
+                continue;
+            }
+
+            MagDataDto dto = new MagDataDto();
+
+            dto.setTime_tag(getText(row, 0));
+            dto.setBx_gsm(parseDouble(getNode(row, 1)));
+            dto.setBy_gsm(parseDouble(getNode(row, 2)));
+            dto.setBz_gsm(parseDouble(getNode(row, 3)));
+            dto.setLon_gsm(parseDouble(getNode(row, 4)));
+            dto.setLat_gsm(parseDouble(getNode(row, 5)));
+            dto.setBt(parseDouble(getNode(row, 6)));
+
+            result.add(dto);
+        }
+        return result;
     }
 
     // ================= PLASMA DATA =================
@@ -46,22 +64,38 @@ public class DataClient {
         return webClient.get()
                 .uri("https://services.swpc.noaa.gov/products/solar-wind/plasma-5-minute.json")
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<List<String>>>() {})
+                .bodyToMono(JsonNode.class)
                 .map(this::mapPlasmaData);
     }
 
-    private List<PlasmaDataDto> mapPlasmaData(List<List<String>> data) {
-        return data.stream()
-                .skip(1)
-                .map(row -> {
-                    PlasmaDataDto dto = new PlasmaDataDto();
-                    dto.setTime_tag(row.get(0));
-                    dto.setDensity(parseDouble(row.get(1)));
-                    dto.setSpeed(parseDouble(row.get(2)));
-                    dto.setTemperature(parseDouble(row.get(3)));
-                    return dto;
-                })
-                .toList();
+    private List<PlasmaDataDto> mapPlasmaData(JsonNode node) {
+        if (!node.isArray()) {
+            throw new RuntimeException("Unexpected PLASMA API response format: " + node);
+        }
+
+        List<PlasmaDataDto> result = new ArrayList<>();
+        Iterator<JsonNode> elements = node.elements();
+
+        boolean isHeader = true;
+
+        while (elements.hasNext()) {
+            JsonNode row = elements.next();
+
+            if (isHeader) {
+                isHeader = false;
+                continue;
+            }
+
+            PlasmaDataDto dto = new PlasmaDataDto();
+
+            dto.setTime_tag(getText(row, 0));
+            dto.setDensity(parseDouble(getNode(row, 1)));
+            dto.setSpeed(parseDouble(getNode(row, 2)));
+            dto.setTemperature(parseDouble(getNode(row, 3)));
+
+            result.add(dto);
+        }
+        return result;
     }
 
     // ================= KP FORECAST =================
@@ -69,28 +103,46 @@ public class DataClient {
         return webClient.get()
                 .uri("https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json")
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<List<String>>>() {})
+                .bodyToMono(JsonNode.class)
                 .map(this::mapKpData);
     }
 
-    private List<KpForecastDto> mapKpData(List<List<String>> data) {
-        return data.stream()
-                .skip(1)
-                .map(row -> {
-                    KpForecastDto dto = new KpForecastDto();
-                    dto.setTime_tag(row.get(0));
-                    dto.setKp(parseDouble(row.get(1)));
-                    dto.setKp(parseDouble(row.get(2)));
-                    return dto;
-                })
-                .toList();
+    private List<KpForecastDto> mapKpData(JsonNode node) {
+        List<KpForecastDto> result = new ArrayList<>();
+
+        for (JsonNode row : node) {
+            KpForecastDto dto = new KpForecastDto();
+            dto.setTime_tag(row.get("time_tag").asText());
+            dto.setKp(row.get("kp").asDouble());
+            dto.setObserved(row.get("observed").asText());
+            dto.setNoaa_scale(row.get("noaa_scale").asText());
+
+            result.add(dto);
+        }
+        return result;
     }
 
-    // ================= HELPER =================
-    private Double parseDouble(String value) {
+    // ================= HELPERS =================
+
+    private JsonNode getNode(JsonNode row, int index) {
+        if (row == null || row.size() <= index) {
+            return null;
+        }
+        return row.get(index);
+    }
+
+    private String getText(JsonNode row, int index) {
+        JsonNode node = getNode(row, index);
+        return node != null && !node.isNull() ? node.asText() : null;
+    }
+
+    private Double parseDouble(JsonNode node) {
         try {
-            return value != null ? Double.valueOf(value) : null;
-        } catch (NumberFormatException e) {
+            if (node == null || node.isNull()) {
+                return null;
+            }
+            return Double.valueOf(node.asText());
+        } catch (Exception e) {
             return null;
         }
     }
