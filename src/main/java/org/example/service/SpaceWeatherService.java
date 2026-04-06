@@ -15,18 +15,16 @@ public class SpaceWeatherService {
     private List<PlasmaDataDto> plasmaCache;
     private List<KpForecastDto> kpCache;
 
-    public void updateCache(List<MagDataDto> mag,
-                            List<PlasmaDataDto> plasma,
-                            List<KpForecastDto> kp) {
-
-        if (mag == null || plasma == null || kp == null
-                || mag.isEmpty() || plasma.isEmpty() || kp.isEmpty()) {
-            return;
-        }
-
+    public synchronized void updateMag(List<MagDataDto> mag) {
         this.magCache = mag;
+    }
+
+    public synchronized void updatePlasma(List<PlasmaDataDto> plasma) {
         this.plasmaCache = plasma;
-        this.kpCache = kp;
+    }
+
+    public synchronized void updateKp(List<KpForecastDto> kp) {
+            this.kpCache = kp;
     }
 
     public SpaceWeatherResponseDto getCachedData() {

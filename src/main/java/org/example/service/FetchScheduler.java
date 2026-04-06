@@ -2,7 +2,6 @@ package org.example.service;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 @Service
 public class FetchScheduler {
@@ -16,14 +15,16 @@ public class FetchScheduler {
 
     @Scheduled(fixedRate = 60000)
     public void updateSpaceWeather() {
-        Mono.zip(
-                dataClient.fetchMagPerMin(),
-                dataClient.fetchPlasmaPerMin(),
-                dataClient.fetchKpForecast()
-        ).subscribe(tuple -> {
-            weatherService.updateCache(tuple.getT1(), tuple.getT2(), tuple.getT3());
-        }, error -> {
-            System.err.println("Failed to fetch NOAA data: " + error.getMessage());
-        });
+        dataClient.fetchMagPerMin()
+                .doOnError(e -> System.err.println("Mag failed: " + e.getMessage()))
+                .subscribe(weatherService::updateMag);
+
+        dataClient.fetchPlasmaPerMin()
+                .doOnError(e -> System.err.println("Plasma failed: " + e.getMessage()))
+                .subscribe(weatherService::updatePlasma);
+
+        dataClient.fetchKpForecast()
+                .doOnError(e -> System.err.println("KP failed: " + e.getMessage()))
+                .subscribe(weatherService::updateKp);
     }
 }
