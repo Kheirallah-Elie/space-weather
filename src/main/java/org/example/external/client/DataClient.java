@@ -1,9 +1,9 @@
-package org.example.service;
+package org.example.external.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.example.dto.KpForecastDto;
-import org.example.dto.MagDataDto;
-import org.example.dto.PlasmaDataDto;
+import org.example.external.dto.KpForecastDto;
+import org.example.external.dto.MagDataDto;
+import org.example.external.dto.PlasmaDataDto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;

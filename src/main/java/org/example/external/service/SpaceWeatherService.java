@@ -1,9 +1,9 @@
-package org.example.service;
+package org.example.external.service;
 
-import org.example.dto.KpForecastDto;
-import org.example.dto.MagDataDto;
-import org.example.dto.PlasmaDataDto;
-import org.example.dto.SpaceWeatherResponseDto;
+import org.example.external.dto.KpForecastDto;
+import org.example.external.dto.MagDataDto;
+import org.example.external.dto.PlasmaDataDto;
+import org.example.external.dto.SpaceWeatherResponseDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

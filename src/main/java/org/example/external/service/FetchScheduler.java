@@ -1,5 +1,6 @@
-package org.example.service;
+package org.example.external.service;
 
+import org.example.external.client.DataClient;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
