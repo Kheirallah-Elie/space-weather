@@ -1,6 +1,6 @@
-package org.example.external.dto;
+package org.example.external.dto.kp;
 
-public class KpForecastDto {
+public class KpDataDto {
 
     private String time_tag;
     private Double kp;

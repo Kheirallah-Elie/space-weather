@@ -1,9 +1,9 @@
 package org.example.external.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.example.external.dto.KpForecastDto;
-import org.example.external.dto.MagDataDto;
-import org.example.external.dto.PlasmaDataDto;
+import org.example.external.dto.kp.KpDataDto;
+import org.example.external.dto.mag.MagDataDto;
+import org.example.external.dto.plasma.PlasmaDataDto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -99,7 +99,7 @@ public class DataClient {
     }
 
     // ================= KP FORECAST =================
-    public Mono<List<KpForecastDto>> fetchKpForecast() {
+    public Mono<List<KpDataDto>> fetchKpForecast() {
         return webClient.get()
                 .uri("https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json")
                 .retrieve()
@@ -107,11 +107,11 @@ public class DataClient {
                 .map(this::mapKpData);
     }
 
-    private List<KpForecastDto> mapKpData(JsonNode node) {
-        List<KpForecastDto> result = new ArrayList<>();
+    private List<KpDataDto> mapKpData(JsonNode node) {
+        List<KpDataDto> result = new ArrayList<>();
 
         for (JsonNode row : node) {
-            KpForecastDto dto = new KpForecastDto();
+            KpDataDto dto = new KpDataDto();
             dto.setTime_tag(row.get("time_tag").asText());
             dto.setKp(row.get("kp").asDouble());
             dto.setObserved(row.get("observed").asText());

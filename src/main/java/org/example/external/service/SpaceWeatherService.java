@@ -1,8 +1,8 @@
 package org.example.external.service;
 
-import org.example.external.dto.KpForecastDto;
-import org.example.external.dto.MagDataDto;
-import org.example.external.dto.PlasmaDataDto;
+import org.example.external.dto.kp.KpDataDto;
+import org.example.external.dto.mag.MagDataDto;
+import org.example.external.dto.plasma.PlasmaDataDto;
 import org.example.external.dto.SpaceWeatherResponseDto;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ public class SpaceWeatherService {
 
     private List<MagDataDto> magCache;
     private List<PlasmaDataDto> plasmaCache;
-    private List<KpForecastDto> kpCache;
+    private List<KpDataDto> kpCache;
 
     public synchronized void updateMag(List<MagDataDto> mag) {
         this.magCache = mag;
@@ -23,7 +23,7 @@ public class SpaceWeatherService {
         this.plasmaCache = plasma;
     }
 
-    public synchronized void updateKp(List<KpForecastDto> kp) {
+    public synchronized void updateKp(List<KpDataDto> kp) {
             this.kpCache = kp;
     }
 

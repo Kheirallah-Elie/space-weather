@@ -1,7 +1,7 @@
 package org.example.mapper;
 
-import org.example.external.dto.MagDataDto;
-import org.example.external.dto.PlasmaDataDto;
+import org.example.external.dto.mag.MagDataDto;
+import org.example.external.dto.plasma.PlasmaDataDto;
 import org.example.external.dto.SpaceWeatherResponseDto;
 import org.example.models.SolarSnapshot;
 import org.springframework.stereotype.Component;
@@ -15,11 +15,8 @@ import java.util.Map;
 @Component
 public class SolarDataMapper {
 
-    private static final DateTimeFormatter MAG_FORMAT =
+    private static final DateTimeFormatter DATE_TIME_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
-    private static final DateTimeFormatter KP_FORMAT =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
 
     public List<SolarSnapshot> merge(SpaceWeatherResponseDto response) {
@@ -39,7 +36,7 @@ public class SolarDataMapper {
 
         for (MagDataDto m : magData) {
 
-            LocalDateTime time = parseMagTime(m.getTime_tag());
+            LocalDateTime time = LocalDateTime.parse(m.getTime_tag(), DATE_TIME_FORMAT);
 
             SolarSnapshot snap = map.computeIfAbsent(time, t -> {
                 SolarSnapshot s = new SolarSnapshot();
@@ -63,7 +60,7 @@ public class SolarDataMapper {
 
         for (PlasmaDataDto p : plasmaData) {
 
-            LocalDateTime time = parseMagTime(p.getTime_tag());
+            LocalDateTime time = LocalDateTime.parse(p.getTime_tag(), DATE_TIME_FORMAT);
 
             SolarSnapshot snap = map.computeIfAbsent(time, t -> {
                 SolarSnapshot s = new SolarSnapshot();
@@ -75,10 +72,5 @@ public class SolarDataMapper {
             snap.setSpeed(p.getSpeed());
             snap.setTemperature(p.getTemperature());
         }
-
-    }
-
-    public LocalDateTime parseMagTime(String time) {
-        return LocalDateTime.parse(time, MAG_FORMAT);
     }
 }

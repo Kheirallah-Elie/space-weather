@@ -1,4 +1,4 @@
-package org.example.external.dto;
+package org.example.external.dto.plasma;
 
 public class PlasmaDataDto {
     private String time_tag;

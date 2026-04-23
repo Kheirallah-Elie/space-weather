@@ -1,4 +1,4 @@
-package org.example.external.dto;
+package org.example.external.dto.mag;
 
 public class MagDataDto {
     private String time_tag;
