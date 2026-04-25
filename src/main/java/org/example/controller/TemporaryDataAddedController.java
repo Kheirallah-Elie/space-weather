@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.service.KpDataIngestionService;
 import org.example.service.MagDataIngestionService;
 import org.example.service.PlasmaDataIngestionService;
 import org.example.service.SolarDataIngestionService;
@@ -17,13 +18,17 @@ public class TemporaryDataAddedController {
     private final PlasmaDataIngestionService plasmaDataIngestionService;
     @Autowired
     private final MagDataIngestionService magDataIngestionService;
+    @Autowired
+    private final KpDataIngestionService kpDataIngestionService;
 
     public TemporaryDataAddedController(SolarDataIngestionService solarDataIngestionService,
                                         PlasmaDataIngestionService plasmaDataIngestionService,
-                                        MagDataIngestionService magDataIngestionService) {
+                                        MagDataIngestionService magDataIngestionService,
+                                        KpDataIngestionService kpDataIngestionService) {
         this.solarDataIngestionService = solarDataIngestionService;
         this.plasmaDataIngestionService = plasmaDataIngestionService;
         this.magDataIngestionService = magDataIngestionService;
+        this.kpDataIngestionService = kpDataIngestionService;
     }
 
     @GetMapping("/add-data")
@@ -39,5 +44,10 @@ public class TemporaryDataAddedController {
     @GetMapping("/add-mag")
     public void addMag() {
         magDataIngestionService.ingest();
+    }
+
+    @GetMapping("/add-kp")
+    public void addKp() {
+        kpDataIngestionService.ingest();
     }
 }

@@ -1,7 +1,7 @@
 package org.example.models;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 public class KpData {
@@ -10,7 +10,7 @@ public class KpData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(unique = true, nullable = false)
-    private LocalDateTime timeTag;
+    private Instant timestamp;
     private Double kp;
     private String type; // observed, estimated, predicted
     private String noaaScale;
@@ -23,12 +23,12 @@ public class KpData {
         this.id = id;
     }
 
-    public LocalDateTime getTimeTag() {
-        return timeTag;
+    public Instant getTimestamp() {
+        return timestamp;
     }
 
-    public void setTimeTag(LocalDateTime timeTag) {
-        this.timeTag = timeTag;
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
     }
 
     public Double getKp() {

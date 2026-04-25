@@ -14,7 +14,6 @@ import java.util.List;
 public class MagDataIngestionService {
     private final MagRepository magRepository;
     private final MagDataService client;
-
     private final MagDataMapper magDataMapper;
 
     public MagDataIngestionService(MagRepository magRepository, MagDataService client, MagDataMapper magDataMapper) {

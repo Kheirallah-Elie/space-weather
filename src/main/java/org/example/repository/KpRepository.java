@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface KpRepository extends JpaRepository<KpData, Long> {
-    //Optional<KpData> findByTimestamp(LocalDateTime timestamp);
+    Optional<KpData> findByTimestamp(LocalDateTime timestamp);
 
 }
