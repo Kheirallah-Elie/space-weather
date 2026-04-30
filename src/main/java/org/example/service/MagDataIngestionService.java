@@ -12,11 +12,16 @@ import java.util.List;
 
 @Service
 public class MagDataIngestionService {
+
     private final MagRepository magRepository;
     private final MagDataService client;
     private final MagDataMapper magDataMapper;
 
-    public MagDataIngestionService(MagRepository magRepository, MagDataService client, MagDataMapper magDataMapper) {
+    public MagDataIngestionService(
+            MagRepository magRepository,
+            MagDataService client,
+            MagDataMapper magDataMapper
+    ) {
         this.magRepository = magRepository;
         this.client = client;
         this.magDataMapper = magDataMapper;
@@ -26,13 +31,21 @@ public class MagDataIngestionService {
     public void ingest() {
 
         MagResponseDto response = client.getMagCachedData();
-
         if (response == null) return;
 
         List<MagData> snapshots = magDataMapper.merge(response);
-
         if (snapshots.isEmpty()) return;
 
-        magRepository.saveAll(snapshots);
+        for (MagData data : snapshots) {
+            magRepository.upsert(
+                    data.getTimestamp(),
+                    data.getBx(),
+                    data.getBy(),
+                    data.getBz(),
+                    data.getLon(),
+                    data.getLat(),
+                    data.getBt()
+            );
+        }
     }
 }

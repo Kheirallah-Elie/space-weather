@@ -30,9 +30,15 @@ public class PlasmaDataIngestionService {
         if (response == null) return;
 
         List<PlasmaData> snapshots = plasmaDataMapper.merge(response);
-
         if (snapshots.isEmpty()) return;
 
-        plasmaRepository.saveAll(snapshots);
+        for (PlasmaData data : snapshots) {
+            plasmaRepository.upsert(
+                    data.getTimestamp(),
+                    data.getDensity(),
+                    data.getSpeed(),
+                    data.getTemperature()
+            );
+        }
     }
 }

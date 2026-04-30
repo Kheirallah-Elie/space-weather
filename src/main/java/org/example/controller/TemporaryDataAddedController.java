@@ -3,7 +3,6 @@ package org.example.controller;
 import org.example.service.KpDataIngestionService;
 import org.example.service.MagDataIngestionService;
 import org.example.service.PlasmaDataIngestionService;
-import org.example.service.SolarDataIngestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,28 +12,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class TemporaryDataAddedController {
     @Autowired
-    private final SolarDataIngestionService solarDataIngestionService;
-    @Autowired
     private final PlasmaDataIngestionService plasmaDataIngestionService;
     @Autowired
     private final MagDataIngestionService magDataIngestionService;
     @Autowired
     private final KpDataIngestionService kpDataIngestionService;
 
-    public TemporaryDataAddedController(SolarDataIngestionService solarDataIngestionService,
-                                        PlasmaDataIngestionService plasmaDataIngestionService,
+    public TemporaryDataAddedController(PlasmaDataIngestionService plasmaDataIngestionService,
                                         MagDataIngestionService magDataIngestionService,
                                         KpDataIngestionService kpDataIngestionService) {
-        this.solarDataIngestionService = solarDataIngestionService;
         this.plasmaDataIngestionService = plasmaDataIngestionService;
         this.magDataIngestionService = magDataIngestionService;
         this.kpDataIngestionService = kpDataIngestionService;
     }
 
-    @GetMapping("/add-data")
-    public void addData() {
-        solarDataIngestionService.ingest();
-    }
 
     @GetMapping("/add-plasma")
     public void addPlasma() {

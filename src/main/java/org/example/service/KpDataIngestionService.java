@@ -26,13 +26,18 @@ public class KpDataIngestionService {
     public void ingest() {
 
         KpResponseDto response = client.getKpCachedData();
-
         if (response == null) return;
 
         List<KpData> snapshots = kpDataMapper.merge(response);
-
         if (snapshots.isEmpty()) return;
 
-        kpRepository.saveAll(snapshots);
+        for (KpData data : snapshots) {
+            kpRepository.upsert(
+                    data.getTimestamp(),
+                    data.getKp(),
+                    data.getType(),
+                    data.getNoaaScale()
+            );
+        }
     }
 }

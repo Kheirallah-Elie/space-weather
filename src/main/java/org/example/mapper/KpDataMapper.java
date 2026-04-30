@@ -44,6 +44,7 @@ public class KpDataMapper {
 
             snap.setKp(m.getKp());
             snap.setNoaaScale(m.getNoaa_scale());
+            snap.setType(m.getObserved());
         }
     }
 }
